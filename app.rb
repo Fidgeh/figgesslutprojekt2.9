@@ -17,7 +17,13 @@ class App < Sinatra::Base
 
     # Routen /
     get '/' do
-        erb :index
+        erb(:"index")
+    end
+
+    get '/excerises' do
+      @excercises = db.execute('SELECT * FROM excercises')
+      
+      erb(:"excerises/index")
     end
 
 end
