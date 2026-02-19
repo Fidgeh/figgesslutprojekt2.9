@@ -17,13 +17,19 @@ class App < Sinatra::Base
 
     # Routen /
     get '/' do
-        erb(:"index")
+        erb(:"exercises/index")
     end
 
-    get '/excerises' do
-      @excercises = db.execute('SELECT * FROM excercises')
+    get '/exercises' do
+      @exercises = db.execute('SELECT * FROM exercises')
       
-      erb(:"excerises/index")
+      erb(:"exercises/index")
+    end
+
+    get '/exercises/:id' do |id|
+      @exercises = db.execute('SELECT * FROM exercises WHERE id=?', id).first
+      
+      erb(:"exercises/show")
     end
 
 end

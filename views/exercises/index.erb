@@ -1,0 +1,19 @@
+<h2 class="rubrik">All excercises</h2>
+
+<ul>
+<% @exercises.each do |exer| %>
+  <li>
+    <a href="/exercises/<%=exer["id"]%>"> <h4> <%= exer['name'] %> </h4> </a>
+
+    <p class="desc_p"> <%= exer['description'] %> </p> 
+    <form class="delete" action="/excercises/<%=exer["id"]%>/delete" method="post">
+      <input type="submit" value="ta bort">
+    </form>
+
+    <form class="update" action="/excercises/<%=exer["id"]%>/edit" method="get">
+      <input type="submit" value="ändra">
+    </form>
+  </li>
+<% end %>
+    
+</ul> 
