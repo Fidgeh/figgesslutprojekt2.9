@@ -1,5 +1,16 @@
 <h2> Mer info om: <%= @exercises['name'].capitalize %> </h2>
 
+<p class="show_muscle_group"> 
+    <%= @exercises['primary_group'] %>
+</p>
+<p class="show_muscle_group"> 
+    <%= @exercises['secondary_group'] %>
+</p>
+
 <p> 
     <%= @exercises['description']%>
-</p>
+</p> 
+
+<div>
+    <img src="<%=@exercises['img_path']%> " alt="<%=@exercises['name'] %>">
+</div> 

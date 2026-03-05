@@ -1,19 +1,32 @@
 <h2 class="rubrik">All excercises</h2>
 
-<ul>
-<% @exercises.each do |exer| %>
-  <li>
-    <a href="/exercises/<%=exer["id"]%>"> <h4> <%= exer['name'] %> </h4> </a>
+<ul class="exercise-grid">
+  <% @exercises.each do |exer| %>
+    <li class="exercise-card">
+      <div class="exercise-image">
+        <img src="<%=exer['img_path']%> " alt="<%= exer['name'] %>">
+      </div>
 
-    <p class="desc_p"> <%= exer['description'] %> </p> 
-    <form class="delete" action="/excercises/<%=exer["id"]%>/delete" method="post">
-      <input type="submit" value="ta bort">
-    </form>
+      <div class="exercise-content">
+        <a href="/exercises/<%=exer["id"]%>">
+          <h4 class="exercise-title"> <%= exer['name'] %> </h4>
+        </a>
 
-    <form class="update" action="/excercises/<%=exer["id"]%>/edit" method="get">
-      <input type="submit" value="ändra">
-    </form>
-  </li>
-<% end %>
-    
+        <div class="card-footer">
+          <span class="desc-tag"> <%= exer['primary_group']%> </span>
+          <span class="desc-tag"> <%= exer['secondary_group']%> </span>
+
+          <div class="button-group">
+            <form class="update" action="/exercises/<%=exer["id"]%>/edit" method="get">
+              <input type="submit" value="ändra">
+            </form>
+
+            <form class="delete" action="/exercises/<%=exer["id"]%>/delete" method="post">
+              <input type="submit" value="ta bort">
+            </form>
+          </div>
+        </div>
+      <div>
+    </li>
+  <% end %>
 </ul> 

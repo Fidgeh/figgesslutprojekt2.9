@@ -19,7 +19,9 @@ class Seeder
                 name TEXT NOT NULL,
                 category_id INTEGER, 
                 description TEXT,
-                img IMG)')
+                primary_group TEXT,
+                secondary_group TEXT,
+                img_path TEXT)')
   end
 
   def self.drop_tables
@@ -27,9 +29,9 @@ class Seeder
   end
 
   def self.populate_tables
-    db.execute('INSERT INTO exercises (name, description, img) VALUES ("Barbell Bench Press", "Chest", "")')
-    db.execute('INSERT INTO exercises (name, description, img) VALUES ("Incline Dumbbell Bench Press", "Upper Chest", "")')
-    db.execute('INSERT INTO exercises (name, description, img) VALUES ("Cable Lat Pull Down", "Lats", "")')
+    db.execute('INSERT INTO exercises (name, description, primary_group, secondary_group, img_path) VALUES ("Barbell Bench Press", "Press weight", "Chest", "Tricep", "/img/Barbell-Bench-Press.gif")')
+    db.execute('INSERT INTO exercises (name, description, primary_group, secondary_group, img_path) VALUES ("Incline Dumbbell Bench Press", "Press weight but inclined", "Upper Chest", "tricep", "/img/Incline_Dumbbell_Bench_Press.gif")')
+    db.execute('INSERT INTO exercises (name, description, primary_group, secondary_group, img_path) VALUES ("Cable Lat Pulldown", "Pull weight", "Lats", "Bicep", "/img/Lat_Pulldown.gif")')
   end
 
   private
