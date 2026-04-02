@@ -1,0 +1,7 @@
+<h2> All programs </h2>
+
+<% @programs.each do |prog| %>
+    <a href="/programs/<%= prog["id"] %>">
+        <h3 class="exercise-title"> <%= prog['name'] %> </h3>
+    </a>
+<% end %>

@@ -1,4 +1,4 @@
-<h2 class="rubrik">All excercises</h2>
+<h2 class="rubrik">All excercises</h2> 
 
 <ul class="exercise-grid">
   <% @exercises.each do |exer| %>
@@ -16,15 +16,18 @@
           <span class="desc-tag"> <%= exer['primary_group']%> </span>
           <span class="desc-tag"> <%= exer['secondary_group']%> </span>
 
-          <div class="button-group">
-            <form class="update" action="/exercises/<%=exer["id"]%>/edit" method="get">
-              <input type="submit" value="ändra">
-            </form>
+          <% if is_admin? %>
+            <div class="button-group">
+              <form class="update" action="/exercises/<%=exer["id"]%>/edit" method="get">
+                <input type="submit" value="ändra">
+              </form>
 
-            <form class="delete" action="/exercises/<%=exer["id"]%>/delete" method="post">
-              <input type="submit" value="ta bort">
-            </form>
-          </div>
+              <form class="delete" action="/exercises/<%=exer["id"]%>/delete" method="post">
+                <input type="submit" value="ta bort">
+              </form>
+            </div>
+          <% end %>
+
         </div>
       <div>
     </li>

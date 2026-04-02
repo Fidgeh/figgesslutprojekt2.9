@@ -1,8 +1,13 @@
 require 'sqlite3'
+require_relative '../config'
+require 'bcrypt'
 
 class Seeder
 
   def self.seed!
+
+    @db = nil
+
     puts "Using db file: #{DB_PATH}"
     puts "🧹 Dropping old tables..."
     drop_tables
@@ -27,11 +32,24 @@ class Seeder
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT NOT NULL,
       password TEXT NOT NULL)')
+
+    db.execute('CREATE TABLE program (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL)')
+
+    db.execute('CREATE TABLE program_exercises (
+      idp INTEGER NOT NULL, 
+      ide1 INTEGER DEFAULT NULL, 
+      ide2 INTEGER DEFAULT NULL,
+      ide3 INTEGER DEFAULT NULL,
+      ide4 INTEGER DEFAULT NULL)')
   end
 
   def self.drop_tables
     db.execute('DROP TABLE IF EXISTS exercises')
     db.execute('DROP TABLE IF EXISTS users')
+    db.execute('DROP TABLE IF EXISTS program')
   end
 
   def self.populate_tables
@@ -39,10 +57,14 @@ class Seeder
     db.execute('INSERT INTO exercises (name, description, primary_group, secondary_group, img_path) VALUES ("Incline Dumbbell Bench Press", "Press weight but inclined", "Upper Chest", "tricep", "/img/Incline_Dumbbell_Bench_Press.gif")')
     db.execute('INSERT INTO exercises (name, description, primary_group, secondary_group, img_path) VALUES ("Cable Lat Pulldown", "Pull weight", "Lats", "Bicep", "/img/Lat_Pulldown.gif")')
   
-    password_hashed = BCrypt::Password.create("123")
+    password_hashed = BCrypt::Password.create("123").to_s
     p "Storing hashed password (#{password_hashed}) to DB. Clear text password (123) never saved"
     db.execute('INSERT INTO users (username, password) VALUES (?, ?)', ["figge", password_hashed])
 
+    db.execute('INSERT INTO program (name, description) VALUES ("Push", "Trycka vikter")')
+    db.execute('INSERT INTO program (name, description) VALUES ("Pull", "Dra vikter")')
+
+    db.execute('INSERT INTO program_exercises (idp, ide1, ide2, ide3) VALUES (1, 1, 2, 3)')
   end
 
   private

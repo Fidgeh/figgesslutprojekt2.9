@@ -9,12 +9,24 @@
 <body>
   <header>
         <h1 class="logo">Exercises</h1>
-        <a href="/admin">Login</a>
+        
+        <% if @current_user %>
+          <form class="delete" action="/logout" method="post">
+            <input type="submit" value="Logga ut">
+          </form>
+        <% else %>
+          <form class="button-group" action="/login" method="get">
+            <input type="submit" value="Logga in">
+          </form>
+        <% end %>
+
     </header>
     <hr>
   <nav>
     <ul>
       <li><a href="/exercises">All exercises</a></li>
+      <li><a href="/exercises/programs">Programs</a></li>
+      <li><a href="/exercises/new">Ny övning</a></li>
     </ul>
 
   </nav>

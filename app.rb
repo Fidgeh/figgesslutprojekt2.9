@@ -27,6 +27,20 @@ class App < Sinatra::Base
       end
     end
 
+    helpers do
+      def is_admin?
+        # Returnerar true om sessionen har ett user_id, annars false
+        !!session[:user_id]
+      end
+
+      def require_admin
+        unless is_admin?
+          ap "Access denied: User not logged in."
+          halt 401, redirect('/access_denied')
+        end
+      end
+    end
+
 
     # Routen /
     get '/admin' do
@@ -40,6 +54,10 @@ class App < Sinatra::Base
     end
 
     get '/access_denied' do 
+      erb(:access_denied)
+    end
+
+    get '/login' do
       erb(:login)
     end
 
@@ -77,7 +95,7 @@ class App < Sinatra::Base
     post '/logout' do
       ap "Logging out"
       session.clear
-      redirect '/'
+      redirect '/exercises'
     end
 
     get '/users/new' do
@@ -99,12 +117,11 @@ class App < Sinatra::Base
       db.execute("DELETE FROM exercises WHERE id=?", id).first
       redirect("/exercises")
     end
-
-    get '/exercises/:id' do |id|
-      @exercises = db.execute('SELECT * FROM exercises WHERE id=?', id).first
-      p @exercises
-      erb(:"exercises/show")
+    
+    get '/exercises/new' do
+      erb(:"exercises/new")
     end
+
 
     get '/exercises/:id/edit' do |id|
       @exercise_info = db.execute("SELECT * FROM exercises WHERE id = ?", id).first
@@ -124,6 +141,35 @@ class App < Sinatra::Base
       redirect("/exercises")
     end
 
+    post '/exercises' do
+      p params
+
+      t_name = params[exercise_name]
+      t_primary = params[primary_muscle]
+      t_secondary = params[secondary_muscle]
+      t_description = params[exercise_description]
+      t_img = params[exercise_img]
+
+      db.execute("INSERT INTO exercises (name, description, primary_group, secondary_group, img_path) VALUES(?, ?, ?, ?, ?)", [t_name, t_description, t_primary, t_secondary, t_img])
+      redirect('/exercises')
+    end
+
+    get '/exercises/programs' do
+      @programs = db.execute('SELECT * FROM program')
+      erb(:"programs/index")
+
+    end
+
+    get '/programs/:id' do
+      @prog = db.execute('SELECT * FROM program WHERE id=?', id)
+      erb(:"programs/show")
+    end
+
+    get '/exercises/:id' do |id|
+      @exercises = db.execute('SELECT * FROM exercises WHERE id=?', id).first
+      p @exercises
+      erb(:"exercises/show")
+    end
 
 
 end
