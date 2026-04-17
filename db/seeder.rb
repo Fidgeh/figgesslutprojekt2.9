@@ -39,17 +39,18 @@ class Seeder
       description TEXT NOT NULL)')
 
     db.execute('CREATE TABLE program_exercises (
-      idp INTEGER NOT NULL, 
-      ide1 INTEGER DEFAULT NULL, 
-      ide2 INTEGER DEFAULT NULL,
-      ide3 INTEGER DEFAULT NULL,
-      ide4 INTEGER DEFAULT NULL)')
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      program_id INTEGER NOT NULL, 
+      exercise_id INTEGER NOT NULL,
+      FOREIGN KEY (program_id) REFERENCES program(id), 
+      FOREIGN KEY (exercise_id) REFERENCES exercises(id))')
   end
 
   def self.drop_tables
     db.execute('DROP TABLE IF EXISTS exercises')
     db.execute('DROP TABLE IF EXISTS users')
     db.execute('DROP TABLE IF EXISTS program')
+    db.execute('DROP TABLE IF EXISTS program_exercises')
   end
 
   def self.populate_tables
@@ -64,7 +65,9 @@ class Seeder
     db.execute('INSERT INTO program (name, description) VALUES ("Push", "Trycka vikter")')
     db.execute('INSERT INTO program (name, description) VALUES ("Pull", "Dra vikter")')
 
-    db.execute('INSERT INTO program_exercises (idp, ide1, ide2, ide3) VALUES (1, 1, 2, 3)')
+    db.execute('INSERT INTO program_exercises (program_id, exercise_id) VALUES (1, 1)')
+    db.execute('INSERT INTO program_exercises (program_id, exercise_id) VALUES (1, 2)')
+    db.execute('INSERT INTO program_exercises (program_id, exercise_id) VALUES (2, 3)')
   end
 
   private

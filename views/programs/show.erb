@@ -1,3 +1,8 @@
-<h2> Hej </h2>
+<h2> <%= @prog["name"]%> </h2>
 
-<h2> <%= @prog["name"] %> </h2>
+<% @program_exercises.each do |exercise| %>
+    <a href = "/exercises/<%= exercise["id"]%>" >
+        <p> <%= exercise["name"] %> </p>
+    </a>
+    <p> <%= exercise["description"]%> </p>
+<% end %>

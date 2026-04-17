@@ -4,4 +4,12 @@
     <a href="/programs/<%= prog["id"] %>">
         <h3 class="exercise-title"> <%= prog['name'] %> </h3>
     </a>
+
+    <% if is_admin? %>
+        <div class="button-group">
+            <form class="delete" action="/program/<%= prog["id"]%>/delete" method="post">
+                <input type="submit" value="ta bort">
+            </form>
+        </div>
+    <% end %>
 <% end %>

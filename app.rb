@@ -117,18 +117,29 @@ class App < Sinatra::Base
       db.execute("DELETE FROM exercises WHERE id=?", id).first
       redirect("/exercises")
     end
+
+    post '/program/:id/delete' do |id|
+      db.execute("DELETE FROM program_exercises WHERE program_id = ?", id)
+      db.execute("DELETE FROM program WHERE id=?", id)
+      redirect("/exercises/programs")
+    end
     
     get '/exercises/new' do
       erb(:"exercises/new")
     end
 
-
-    get '/exercises/:id/edit' do |id|
-      @exercise_info = db.execute("SELECT * FROM exercises WHERE id = ?", id).first
-      p @exercise_info
-      erb(:"exercises/edit")
-    end
-
+    
+      get '/exercises/:id/edit' do |id|
+        @exercise_info = db.execute("SELECT * FROM exercises WHERE id = ?", id).first
+        p @exercise_info
+        if is_admin?
+          erb(:"exercises/edit")
+        else
+          erb(:"access_denied")
+        end
+      end
+    
+    
     post '/exercises/:id/update' do |id|
 
       e_name = params["exercise_name"]
@@ -160,8 +171,18 @@ class App < Sinatra::Base
 
     end
 
-    get '/programs/:id' do
-      @prog = db.execute('SELECT * FROM program WHERE id=?', id)
+    get '/programs/:id' do |id|
+      @prog = db.execute('SELECT * FROM program WHERE id=?', id).first
+
+      @program_exercises = db.execute("
+      SELECT exercises.*
+      FROM exercises
+      JOIN program_exercises
+        ON exercises.id = program_exercises.exercise_id
+      WHERE program_exercises.program_id = ?
+      ", id)
+
+
       erb(:"programs/show")
     end
 
