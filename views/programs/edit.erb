@@ -1,0 +1,21 @@
+<form action="/program/<%= @program["id"]%>/update" method="post" >
+    <label> Program name
+        <input type="text" name="program_name" value="<%= @program["name"]%>">
+    </label>
+
+    <label> Description
+        <input type="text" name="program_description" value="<%= @program["description"]%>">
+    </label>
+
+    <h3>Choose programs:</h3>
+    <% @all_exercises.each do |exercise| %>
+        <label>
+            <input type="checkbox" name="exercise_ids[]" value="<%= exercise["id"]%>"
+            <%= "checked" if @current_exercise_ids.include?(exercise["id"])%>>
+            <%= exercise["name"]%>
+        </label><br>
+    
+        <input type="submit" value="Update">
+    <% end %>
+
+</form>

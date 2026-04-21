@@ -129,15 +129,50 @@ class App < Sinatra::Base
     end
 
     
-      get '/exercises/:id/edit' do |id|
-        @exercise_info = db.execute("SELECT * FROM exercises WHERE id = ?", id).first
-        p @exercise_info
-        if is_admin?
-          erb(:"exercises/edit")
-        else
-          erb(:"access_denied")
+    get '/exercises/:id/edit' do |id|
+      @exercise_info = db.execute("SELECT * FROM exercises WHERE id = ?", id).first
+      p @exercise_info
+      if is_admin?
+        erb(:"exercises/edit")
+      else
+        erb(:"access_denied")
+      end
+    end
+
+    get '/program/:id/edit' do |id|
+      id = params[:id]
+      db = SQLite3::Database.new(DB_PATH)
+      db.results_as_hash = true
+
+      @program = db.execute("SELECT * FROM program WHERE id = ?", id).first
+
+      @all_exercises = db.execute("SELECT * FROM exercises")
+
+      existing_relations = db.execute("SELECT exercise_id FROM program_exercises WHERE program_id = ?", id)
+      @current_exercise_ids = existing_relations.map { |row| row["exercise_id"]}
+
+      erb(:"programs/edit")
+    end
+
+    post '/program/:id/update' do
+      id = params[:id]
+      new_name = params[:program_name]
+      new_desc = params[:program_description]
+      selected_exercises = params[:exercise_ids]
+
+      db = SQLite3::Database.new(DB_PATH)
+
+      db.execute("UPDATE program SET name=?, description=? WHERE id=?", [new_name, new_desc, id])
+      db.execute("DELETE FROM program_exercises WHERE program_id=?", [id])
+
+      if selected_exercises
+        selected_exercises.each do |ex_id|
+          db.execute("INSERT INTO program_exercises (program_id, exercise_id) VALUES(?, ?)", [id, ex_id])
         end
       end
+
+      redirect("/programs")
+    end
     
     
     post '/exercises/:id/update' do |id|
