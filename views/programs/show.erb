@@ -1,4 +1,5 @@
 <h2> <%= @prog["name"]%> </h2>
+<h3> <%= @prog["description"]%> </h3>
 
 <% @program_exercises.each do |exercise| %>
     <a href = "/exercises/<%= exercise["id"]%>" >

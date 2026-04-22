@@ -154,7 +154,7 @@ class App < Sinatra::Base
       erb(:"programs/edit")
     end
 
-    post '/program/:id/update' do
+    post '/program/:id/update/?' do |id|
       id = params[:id]
       new_name = params[:program_name]
       new_desc = params[:program_description]
@@ -200,7 +200,7 @@ class App < Sinatra::Base
       redirect('/exercises')
     end
 
-    get '/exercises/programs' do
+    get '/programs' do
       @programs = db.execute('SELECT * FROM program')
       erb(:"programs/index")
 
