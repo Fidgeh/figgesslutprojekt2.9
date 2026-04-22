@@ -98,8 +98,27 @@ class App < Sinatra::Base
       redirect '/exercises'
     end
 
+    get '/users/index' do
+      @users = db.execute("SELECT * FROM users")
+
+      erb(:"users/index")
+    end
+
     get '/users/new' do
       erb(:"users/new")
+    end
+
+    post '/users' do
+      username = params[:username]
+      password = params[:password]
+  
+      password_hashed = BCrypt::Password.create(password)
+  
+      db = SQLite3::Database.new(DB_PATH)
+
+      db.execute("INSERT INTO users (username, password) VALUES (?, ?)", [username, password_hashed])
+      redirect "/login" 
+      
     end
     
     
@@ -190,11 +209,11 @@ class App < Sinatra::Base
     post '/exercises' do
       p params
 
-      t_name = params[exercise_name]
-      t_primary = params[primary_muscle]
-      t_secondary = params[secondary_muscle]
-      t_description = params[exercise_description]
-      t_img = params[exercise_img]
+      t_name = params[:exercise_name]
+      t_primary = params[:primary_muscle]
+      t_secondary = params[:secondary_muscle]
+      t_description = params[:exercise_description]
+      t_img = params[:exercise_img]
 
       db.execute("INSERT INTO exercises (name, description, primary_group, secondary_group, img_path) VALUES(?, ?, ?, ?, ?)", [t_name, t_description, t_primary, t_secondary, t_img])
       redirect('/exercises')

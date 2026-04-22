@@ -1,3 +1,13 @@
-<h2>Registrera ny användare</h2>
-<p>Här kommer formuläret för att registrera en ny användare finnas</p>
-<p>Så länge skapas konto för användare bara i <code>seeder.rb</code></p>
+<h2>Skapa nytt konto</h2>
+
+<form action="/users" method="post">
+    <label>Användarnamn:
+        <input type="text" name="username" required>
+    </label>
+    <br>
+    <label>Lösenord:
+        <input type="password" name="password" required>
+    </label>
+    <br>
+    <input type="submit" value="Registrera dig">
+</form>
