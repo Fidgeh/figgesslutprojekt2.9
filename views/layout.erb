@@ -18,6 +18,9 @@
           <form class="button-group" action="/login" method="get">
             <input type="submit" value="Logga in">
           </form>
+          <form class="button-group" action="/users/new" method="get">
+            <input type="submit" value="Sign up"> 
+          </form>
         <% end %>
 
     </header>
@@ -25,10 +28,12 @@
   <nav>
     <ul>
       <li><a href="/exercises">All exercises</a></li>
-      <li><a href="/programs">Programs</a></li>
-      <li><a href="/exercises/new">Ny övning</a></li>
-      <li><a href="/users/new">Ny användare</a></li>
       <li><a href="/users/index">Alla användare</a></li>
+      <li><a href="/programs">Programs</a></li>
+      <% if is_admin? %>
+        <li><a href="/exercises/new">Ny övning</a></li>
+        <li><a href="/programs/new">Nytt program</a></li>
+      <% end %>
     </ul>
 
   </nav>

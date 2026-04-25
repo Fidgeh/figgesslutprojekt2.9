@@ -1,5 +1,8 @@
 require 'debug'
 require "awesome_print"
+require_relative 'models/exercises'
+require_relative 'models/program'
+require_relative 'models/users'
 
 class App < Sinatra::Base
 
@@ -22,7 +25,7 @@ class App < Sinatra::Base
 
     before do
       if session[:user_id]
-        @current_user = db.execute("SELECT * FROM users WHERE id=?", session[:user_id]).first
+        @current_user = User.find(session[:user_id])
         ap @current_user
       end
     end
@@ -65,10 +68,7 @@ class App < Sinatra::Base
       request_username = params[:username]
       request_plain_password = params[:password]
 
-      user = db.execute("SELECT *
-              FROM users
-              WHERE username = ?",
-              request_username).first
+      user = User.find_user(request_username)
       
       unless user
         ap "/login : Invalid username."
@@ -99,13 +99,13 @@ class App < Sinatra::Base
     end
 
     get '/users/index' do
-      @users = db.execute("SELECT * FROM users")
+      @users = User.all
 
       erb(:"users/index")
     end
 
     get '/users/new' do
-      erb(:"users/new")
+        erb(:"users/new")
     end
 
     post '/users' do
@@ -113,10 +113,8 @@ class App < Sinatra::Base
       password = params[:password]
   
       password_hashed = BCrypt::Password.create(password)
-  
-      db = SQLite3::Database.new(DB_PATH)
 
-      db.execute("INSERT INTO users (username, password) VALUES (?, ?)", [username, password_hashed])
+      User.create(username, password_hashed)
       redirect "/login" 
       
     end
@@ -127,30 +125,57 @@ class App < Sinatra::Base
     end
 
     get '/exercises' do
-      @exercises = db.execute('SELECT * FROM exercises')
+      @exercises = Exercises.all
       
       erb(:"exercises/index")
     end
 
     post '/exercises/:id/delete' do |id|
-      db.execute("DELETE FROM exercises WHERE id=?", id).first
+      Exercises.delete(id)
       redirect("/exercises")
     end
 
     post '/program/:id/delete' do |id|
-      db.execute("DELETE FROM program_exercises WHERE program_id = ?", id)
-      db.execute("DELETE FROM program WHERE id=?", id)
-      redirect("/exercises/programs")
+      Program_exercises.delete(id)
+      Program.delete(id)
+      redirect("/programs")
     end
     
     get '/exercises/new' do
-      erb(:"exercises/new")
+      if is_admin?
+        erb(:"exercises/new")
+      else
+        erb(:"access_denied")
+      end
     end
 
+    get '/programs/new' do
+      @all_exercises = Exercises.all
+      if is_admin?
+        erb(:"programs/new")
+      else
+        erb(:"access_denied")
+      end
+    end
+
+    post '/programs' do
+      name = params[:program_name]
+      description = params[:program_description]
+      exercise_ids = params[:exercise_ids]
+
+      new_program_id = Program.create(name, description)
+
+      if exercise_ids
+        exercise_ids.each do |ex_id|
+          Program_exercises.create(new_program_id, ex_id)
+        end
+      end
+
+      redirect("/programs")
+    end
     
     get '/exercises/:id/edit' do |id|
-      @exercise_info = db.execute("SELECT * FROM exercises WHERE id = ?", id).first
-      p @exercise_info
+      @exercise_info = Exercises.find(id)
       if is_admin?
         erb(:"exercises/edit")
       else
@@ -160,15 +185,12 @@ class App < Sinatra::Base
 
     get '/program/:id/edit' do |id|
       id = params[:id]
-      db = SQLite3::Database.new(DB_PATH)
-      db.results_as_hash = true
 
-      @program = db.execute("SELECT * FROM program WHERE id = ?", id).first
+      @program = Program.find(id)
 
-      @all_exercises = db.execute("SELECT * FROM exercises")
+      @all_exercises = Exercises.all
 
-      existing_relations = db.execute("SELECT exercise_id FROM program_exercises WHERE program_id = ?", id)
-      @current_exercise_ids = existing_relations.map { |row| row["exercise_id"]}
+      @current_exercise_ids = Program_exercises.find(id)
 
       erb(:"programs/edit")
     end
@@ -179,14 +201,12 @@ class App < Sinatra::Base
       new_desc = params[:program_description]
       selected_exercises = params[:exercise_ids]
 
-      db = SQLite3::Database.new(DB_PATH)
-
-      db.execute("UPDATE program SET name=?, description=? WHERE id=?", [new_name, new_desc, id])
-      db.execute("DELETE FROM program_exercises WHERE program_id=?", [id])
+      Program.update(id, new_name, new_desc)
+      Program_exercises.delete(id)
 
       if selected_exercises
         selected_exercises.each do |ex_id|
-          db.execute("INSERT INTO program_exercises (program_id, exercise_id) VALUES(?, ?)", [id, ex_id])
+          Program_exercises.create(id, ex_id)
         end
       end
 
@@ -196,12 +216,12 @@ class App < Sinatra::Base
     
     post '/exercises/:id/update' do |id|
 
-      e_name = params["exercise_name"]
-      e_description = params["exercise_description"]
-      e_primary = params["exercise_primary"]
-      e_secondary = params["exercise_secondary"]
+      e_name = params[:exercise_name]
+      e_description = params[:exercise_description]
+      e_primary = params[:exercise_primary]
+      e_secondary = params[:exercise_secondary]
 
-      db.execute("UPDATE exercises SET name =?, description=?, primary_group=?, secondary_group=? WHERE id =?", [e_name, e_description, e_primary, e_secondary, id])
+      Exercises.update(id, e_name, e_description, e_primary, e_secondary)
 
       redirect("/exercises")
     end
@@ -215,34 +235,26 @@ class App < Sinatra::Base
       t_description = params[:exercise_description]
       t_img = params[:exercise_img]
 
-      db.execute("INSERT INTO exercises (name, description, primary_group, secondary_group, img_path) VALUES(?, ?, ?, ?, ?)", [t_name, t_description, t_primary, t_secondary, t_img])
+      Exercises.create(t_name, t_description, t_primary, t_secondary, t_img)
       redirect('/exercises')
     end
 
     get '/programs' do
-      @programs = db.execute('SELECT * FROM program')
+      @programs = Program.all
       erb(:"programs/index")
-
     end
 
     get '/programs/:id' do |id|
-      @prog = db.execute('SELECT * FROM program WHERE id=?', id).first
+      @prog = Program.find(id)
 
-      @program_exercises = db.execute("
-      SELECT exercises.*
-      FROM exercises
-      JOIN program_exercises
-        ON exercises.id = program_exercises.exercise_id
-      WHERE program_exercises.program_id = ?
-      ", id)
+      @program_exercises = Program_exercises.for_program(id)
 
 
       erb(:"programs/show")
     end
 
     get '/exercises/:id' do |id|
-      @exercises = db.execute('SELECT * FROM exercises WHERE id=?', id).first
-      p @exercises
+      @exercises = Exercises.find(id)
       erb(:"exercises/show")
     end
 

@@ -1,0 +1,22 @@
+<h2> Skapa nytt program </h2>
+
+<form action="/programs" method="post">
+    <label>Namn <input type="text" name="program_name"></label>
+    <br>
+    <label>Beskrivning <input type="text" name="program_description"></label>
+    <br>
+    
+    <h3> Välj vilka övningar som ska ingå </h3>
+    <% @all_exercises.each do |exercise| %>
+        <label>
+            <input type="checkbox" name="exercise_ids[]" value="<%= exercise["id"] %>">
+            <%= exercise["name"]%>
+            <br>
+        </label>
+    <% end %>
+    
+    <br>
+    <label> <input type="submit" value="Spara">
+
+
+</form>

@@ -59,8 +59,11 @@ class Seeder
     db.execute('INSERT INTO exercises (name, description, primary_group, secondary_group, img_path) VALUES ("Cable Lat Pulldown", "Pull weight", "Lats", "Bicep", "/img/Lat_Pulldown.gif")')
   
     password_hashed = BCrypt::Password.create("123").to_s
+    password_hashed2 = BCrypt::Password.create("jagare").to_s
     p "Storing hashed password (#{password_hashed}) to DB. Clear text password (123) never saved"
+    p "Storing hashed password (#{password_hashed2}) to DB. Clear text password (jagare) never saved"
     db.execute('INSERT INTO users (username, password) VALUES (?, ?)', ["figge", password_hashed])
+    db.execute('INSERT INTO users (username, password) VALUES (?, ?)', ["svante", password_hashed2])
 
     db.execute('INSERT INTO program (name, description) VALUES ("Push", "Trycka vikter")')
     db.execute('INSERT INTO program (name, description) VALUES ("Pull", "Dra vikter")')
