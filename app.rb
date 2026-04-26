@@ -3,6 +3,7 @@ require "awesome_print"
 require_relative 'models/exercises'
 require_relative 'models/program'
 require_relative 'models/users'
+require_relative 'models/program_exercises'
 
 class App < Sinatra::Base
 
@@ -74,6 +75,7 @@ class App < Sinatra::Base
         ap "/login : Invalid username."
         status 401
         redirect '/access_denied'
+
       end
 
       db_id = user["id"].to_i
@@ -135,7 +137,7 @@ class App < Sinatra::Base
       redirect("/exercises")
     end
 
-    post '/program/:id/delete' do |id|
+    post '/programs/:id/delete' do |id|
       Program_exercises.delete(id)
       Program.delete(id)
       redirect("/programs")
@@ -183,7 +185,7 @@ class App < Sinatra::Base
       end
     end
 
-    get '/program/:id/edit' do |id|
+    get '/programs/:id/edit' do |id|
       id = params[:id]
 
       @program = Program.find(id)
@@ -195,7 +197,7 @@ class App < Sinatra::Base
       erb(:"programs/edit")
     end
 
-    post '/program/:id/update/?' do |id|
+    post '/programs/:id/update/?' do |id|
       id = params[:id]
       new_name = params[:program_name]
       new_desc = params[:program_description]

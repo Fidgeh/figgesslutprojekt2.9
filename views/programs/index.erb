@@ -7,13 +7,13 @@
 
     <% if is_admin? %>
         <div class="button-group">
-            <form class="delete" action="/program/<%= prog["id"]%>/delete" method="post">
+            <form class="delete" action="/programs/<%= prog["id"]%>/delete" method="post">
                 <input type="submit" value="ta bort">
             </form>
         </div>
 
         <div class="button-group">
-            <form class="update" action="/program/<%= prog["id"]%>/edit" method="get">
+            <form class="update" action="/programs/<%= prog["id"]%>/edit" method="get">
                 <input type="submit" value="ändra">
             </form>
         </div>

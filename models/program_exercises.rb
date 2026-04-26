@@ -18,7 +18,7 @@ class Program_exercises < BaseModel
   end
 
   def self.delete(id)
-    db.execute('DELETE FROM program_exercises WHERE id =?', id).first
+    db.execute('DELETE FROM program_exercises WHERE program_id =?', id).first
   end
 
   def self.for_program(id)
